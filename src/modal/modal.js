@@ -422,7 +422,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
         if (!appendToElement.length) {
           throw new Error('appendTo element not found. Make sure that the element passed is in DOM.');
         }
-
+        
         if (currBackdropIndex >= 0 && !backdropDomEl) {
           backdropScope = $rootScope.$new(true);
           backdropScope.modalOptions = modal;
@@ -430,7 +430,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
           backdropDomEl = angular.element('<div uib-modal-backdrop="modal-backdrop"></div>');
           backdropDomEl.attr({
             'class': 'modal-backdrop',
-            'ng-style': '{\'z-index\': 1040 + (index && 1 || 0) + index*10}',
+            // 'ng-style': '{\'z-index\': 1040 + (index && 1 || 0) + index*10}',
             'uib-modal-animation-class': 'fade',
             'modal-in-class': 'in'
           });
@@ -442,7 +442,9 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
             backdropDomEl.attr('modal-animation', 'true');
           }
           $compile(backdropDomEl)(backdropScope);
-          $animate.enter(backdropDomEl, appendToElement);
+          // $animate.enter(backdropDomEl, appendToElement); 
+          // 直接追加容器最后 老逻辑是追加到容器最前
+          appendToElement.append(backdropDomEl);
           if ($uibPosition.isScrollable(appendToElement)) {
             scrollbarPadding = $uibPosition.scrollbarPadding(appendToElement);
             if (scrollbarPadding.heightOverflow && scrollbarPadding.scrollbarWidth) {
@@ -478,7 +480,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
           'size': modal.size,
           'index': topModalIndex,
           'animate': 'animate',
-          'ng-style': '{\'z-index\': 1050 + $$topModalIndex*10, display: \'block\'}',
+          // 'ng-style': '{\'z-index\': 1050 + $$topModalIndex*10, display: \'block\'}',
+          'ng-style': '{display: \'block\'}',
           'tabindex': -1,
           'uib-modal-animation-class': 'fade',
           'modal-in-class': 'in'
@@ -497,7 +500,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
           // because it is needed by ngStyle to compute the zIndex property.
           modal.scope.$$topModalIndex = topModalIndex;
         }
-        $animate.enter($compile(angularDomEl)(modal.scope), appendToElement);
+        var children = appendToElement.children();
+        $animate.enter($compile(angularDomEl)(modal.scope), appendToElement, children ? children[children.length -1] : null);
 
         openedWindows.top().value.modalDomEl = angularDomEl;
         openedWindows.top().value.modalOpener = modalOpener;
@@ -697,7 +701,12 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
             //merge and clean up options
             modalOptions = angular.extend({}, $modalProvider.options, modalOptions);
             modalOptions.resolve = modalOptions.resolve || {};
-            modalOptions.appendTo = modalOptions.appendTo || $document.find('body').eq(0);
+            if (!document.querySelector('.cdk-overlay-container')) {
+              var cdkOverlayContainer = document.createElement('div')
+              cdkOverlayContainer.className = 'cdk-overlay-container';
+              document.body.append(cdkOverlayContainer);
+            }
+            modalOptions.appendTo = modalOptions.appendTo || angular.element(document.querySelector('.cdk-overlay-container'));;
 
             //verify options
             if (!modalOptions.component && !modalOptions.template && !modalOptions.templateUrl) {
