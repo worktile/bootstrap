@@ -702,11 +702,11 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
             modalOptions = angular.extend({}, $modalProvider.options, modalOptions);
             modalOptions.resolve = modalOptions.resolve || {};
             if (!document.querySelector('.cdk-overlay-container')) {
-              var cdkOverlayContainer = document.createElement('div')
+              var cdkOverlayContainer = document.createElement('div');
               cdkOverlayContainer.className = 'cdk-overlay-container';
               document.body.append(cdkOverlayContainer);
             }
-            modalOptions.appendTo = modalOptions.appendTo || angular.element(document.querySelector('.cdk-overlay-container'));;
+            modalOptions.appendTo = modalOptions.appendTo || angular.element(document.querySelector('.cdk-overlay-container'));
 
             //verify options
             if (!modalOptions.component && !modalOptions.template && !modalOptions.templateUrl) {
