@@ -90,8 +90,6 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.multiMap', 'ui.bootstrap.sta
         scope.size = attrs.size;
 
         scope.close = function(evt) {
-          console.log(evt.target);
-          console.log(evt.currentTarget);
           var modal = $modalStack.getTop();
           if (modal && modal.value.backdrop &&
             modal.value.backdrop !== 'static' &&
